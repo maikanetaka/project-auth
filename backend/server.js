@@ -39,6 +39,11 @@ const User = mongoose.model("User", userSchema);
 app.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body; // Getting username and password info from req.body
+
+    if (password.length < 8) {
+      res.status(400).send("Passwords need to be at least 8 characters long");
+    }
+
     const user = new User({ username, password }); // Create new user
     await user.save(); // Here, finally save user info in the database
     res.status(201).send("User registered successfully");
