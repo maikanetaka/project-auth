@@ -3,6 +3,7 @@ import express from "express"; // Framework to create a server
 import mongoose from "mongoose"; // To access MongoDB
 import bcrypt from "bcrypt"; // Library to hash passwords safely
 import jwt from "jsonwebtoken"; // Library to create a token for authenticating users - usually put in cookie
+import expressListEndpoints from "express-list-endpoints";
 
 // Set the URL to connect MongoDB. If the environment variable is not set, connect to the local MongoDB instance.
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/project-mongo";
@@ -67,27 +68,32 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Authentication middleware
+// re-useable token checker - Authentication middleware - express thing
 const authenticateToken = (req, res, next) => {
   const token = req.headers["authorization"]; // Get token from request headers
   if (!token) return res.status(401).send("Access denied"); // If no token, deny access
 
   jwt.verify(token, process.env.SECRET, (err, user) => {
-    // Verify token
     if (err) return res.status(403).send("Invalid token"); // If token is invalid, deny access
     req.user = user; // Add user info to request
     next(); // Proceed to the next middleware
   });
 };
 
-// Endpoint accessible only to authenticated users
+// Endpoint accessible only to authenticated users - with using above middleware (in this case, token checker)
 app.get("/protected", authenticateToken, (req, res) => {
   res.status(200).send("This is protected content"); // Return protected content
 });
 
-// Root endpoint
+// API documentation endpoint
 app.get("/", (req, res) => {
-  res.send("Hello Technigo!"); // Return a simple message
+  res.json(
+    expressListEndpoints(app).map((endpoint) => ({
+      method: endpoint.methods.join(", "),
+      path: endpoint.path,
+      middlewares: endpoint.middlewares,
+    }))
+  );
 });
 
 // Start the server
