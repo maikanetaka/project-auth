@@ -19,7 +19,7 @@ app.use(express.json());
 
 // Define the user schema / how the data is structured for mongo
 const userSchema = new mongoose.Schema({
-  username: { type: String, required: true, unique: true },
+  username: { type: String, required: true, unique: true, minlength: 8 },
   email: { type: String, required: true, unique: true, match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/ },
   password: { type: String, required: true },
   token: { type: String },
@@ -41,12 +41,23 @@ app.post("/register", async (req, res) => {
   try {
     const { username, password } = req.body; // Getting username and password info from req.body
 
-    if (password.length < 8) {
+    /* if (password.length < 8) {
       res.status(400).send("Passwords need to be at least 8 characters long");
+    } */
+
+    // Check that user is new or has an account already
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] })
+    if (existingUser) {
+      if (existingUser.username === username) {
+        return res.status(400).json({field: "username", message: "This username is already taken."})
+      }
+      if (exisitngUser.email === email) {
+        return res.status(400).json({ field: "email", message: "Email address is already registered"})
+      }
     }
 
     const user = new User({ username, password }); // Create new user
-    await user.save(); // Here, finally save user info in the database
+    await user.save(); // Here, finally save user info in the database 
     res.status(201).send("User registered successfully");
   } catch (error) {
     res.status(400).send("Error registering user");
