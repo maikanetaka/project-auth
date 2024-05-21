@@ -82,6 +82,7 @@ const authenticateToken = (req, res, next) => {
     if (err) return res.status(403).send("Invalid token"); // If token is invalid, deny access
     req.user = user; // Add user info to request
     next(); // Proceed to the next middleware
+    console.log(process.env.SECRET)
   });
 };
 
