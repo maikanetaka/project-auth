@@ -5,7 +5,6 @@
   "scripts": {
     "start": "babel-node server.js",
     "dev": "nodemon -r dotenv/config server.js --exec babel-node" 
-    //-r dotenv/configは、サーバーを起動する前に.envファイルを読み込む
   },
   "author": "",
   "license": "ISC",
