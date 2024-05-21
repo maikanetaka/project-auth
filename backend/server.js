@@ -52,7 +52,7 @@ app.post("/register", async (req, res) => {
         return res.status(400).json({field: "username", message: "This username is already taken."})
       }
       if (exisitngUser.email === email) {
-        return res.status(400).json({ field: "email", message: "Email address is already registered"})
+        return res.status(400).json({ field: "email", message: "This email is already registered."})
       }
     }
 
